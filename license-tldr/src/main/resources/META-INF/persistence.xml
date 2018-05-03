@@ -1,0 +1,9 @@
+<persistence>
+   <persistence-unit name="licenses">
+      <provider>org.hibernate.ejb.HibernatePersistence</provider>
+      <jta-data-source>java:/LicenseDatabase</jta-data-source>
+      <properties>
+         <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      </properties>
+   </persistence-unit>
+</persistence>
