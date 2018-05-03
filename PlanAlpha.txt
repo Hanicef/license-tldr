@@ -1,0 +1,29 @@
+Name
+Summary
+LinkURL
+(change history?)
+
+Username
+password
+eMail
+
+Get ->
+	Load all data as Json.
+	->
+	Get single entry as Json.
+
+Put ->
+	new object name, summary, Link, (change history? + editor)
+	
+Post ->
+	Get user ->
+		Validate user
+		Open edit interface - load current data
+		Commit ->
+			(Add note to history)
+			save to database
+		
+Delete ->
+	Get user ->
+		Validate user
+		Delete entry from database
