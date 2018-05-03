@@ -1,7 +1,7 @@
+id
 Name
 Summary
-LinkURL
-(change history?)
+SourceURL
 
 Username
 password
@@ -14,7 +14,7 @@ Get ->
 
 Put ->
 	new object name, summary, Link, (change history? + editor)
-	
+
 Post ->
 	Get user ->
 		Validate user
@@ -22,8 +22,19 @@ Post ->
 		Commit ->
 			(Add note to history)
 			save to database
-		
+
 Delete ->
 	Get user ->
 		Validate user
 		Delete entry from database
+
+
+
+getAll - parameter: none
+getById - parameter: id
+getByName - parameter: name
+
+
+addLicence - add all data, [let db add date&creator or let java?]
+updateLicence - concat oldHistory & newHistory, save new data
+deleteLicence?
