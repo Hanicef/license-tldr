@@ -1,3 +1,5 @@
 license-tldr/target*
 *.swp
 *.tmp
+*.iml
+.idea
