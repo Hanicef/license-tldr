@@ -15,7 +15,6 @@ public class License implements Serializable {
    @Column(name="name", length=64)
    private String name;
 
-   @Column(name="summary")
    @ManyToOne
    @JoinColumn
    private Summary summary;
