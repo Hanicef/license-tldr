@@ -135,7 +135,7 @@ form .submit {
   margin-top: 20px;
 }
 form .submit:hover {
-  background-color: purple;
+  background-color: #55d6aa;
   cursor: pointer;
   transition: all 1s ease-in-out;
 
