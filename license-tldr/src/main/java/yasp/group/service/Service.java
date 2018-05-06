@@ -9,11 +9,11 @@ import yasp.group.entity.License;
 @Local
 public class Service {
 
-   @PersistenceContext
-   private EntityManager manager;
+	@PersistenceContext
+	private EntityManager manager;
 
-   public List<License> getAllLicenses() {
-      List<License> result = manager.createQuery("SELECT license FROM License license").getResultList();
-      return result;
-   }
+	public List<License> getAllLicenses() {
+		List<License> result = manager.createQuery("SELECT license FROM License license").getResultList();
+		return result;
+	}
 }
