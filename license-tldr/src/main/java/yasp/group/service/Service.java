@@ -7,6 +7,7 @@ import java.util.List;
 import yasp.group.entity.License;
 
 @Local
+@Stateless
 public class Service {
 
 	@PersistenceContext
