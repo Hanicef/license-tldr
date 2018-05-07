@@ -2,6 +2,7 @@
 package yasp.group.entity;
 
 import javax.persistence.*;
+import java.util.List;
 import java.io.Serializable;
 
 @Entity
@@ -15,7 +16,6 @@ public class License implements Serializable {
 	@Column(name="name", length=64)
 	private String name;
 
-	@ManyToOne
 	@JoinColumn
 	private Summary summary;
 
