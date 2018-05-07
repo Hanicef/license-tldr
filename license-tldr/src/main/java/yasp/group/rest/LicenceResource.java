@@ -3,14 +3,17 @@ import yasp.group.entity.License;
 import yasp.group.service.LicenseNotFoundException;
 import yasp.group.service.Service;
 
-import javax.ejb.Stateless;
+import javax.ejb.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.inject.Inject;
 import java.util.List;
 
-@Stateless
-@Path("/licences")
+@Singleton
+// WHY TF WAS LICENSES SPELLED WITH A C!?
+// I SPENT AT LEAST 6 HOURS ON THIS GARBAGE
+//@Path("/licences")
+@Path("/licenses")
 public class LicenceResource {
 	@Inject
 	private Service service;
