@@ -20,7 +20,7 @@ public class Service {
 	}
 
 	public List<Summary> getAllSummary() {
-		List<Summary> result = manager.createQuery("SELECT l FROM Summary s").getResultList();
+		List<Summary> result = manager.createQuery("SELECT s FROM Summary s").getResultList();
 		return result;
 	}
 
