@@ -69,9 +69,13 @@ public class Service {
 	}
 
 	public List<Summary> getSummaryFromLicense(License license) {
+		return this.getSummaryFromLicense(license.getId());
+	}
+
+	public List<Summary> getSummaryFromLicense(int id) {
 		List<LicenseSummary> list =
 			manager.createQuery("SELECT ls FROM LicenseSummary ls WHERE ls.license = :id", LicenseSummary.class)
-			.setParameter("id", license.getID())
+			.setParameter("id", id)
 			.getResultList();
 		List<Summary> result = new ArrayList<Summary>();
 		for (int i = 0; i < list.size(); i++) {
