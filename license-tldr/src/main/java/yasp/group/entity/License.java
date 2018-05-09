@@ -25,8 +25,7 @@ public class License implements Serializable {
 	public License() {
 	}
 
-	public License(int id, String name, Summary summary, String sourceURL) {
-		this.id = id;
+	public License(String name, Summary summary, String sourceURL) {
 		this.name = name;
 		this.summary = summary;
 		this.sourceURL = sourceURL;
@@ -37,7 +36,6 @@ public class License implements Serializable {
 	public Summary getSummary() { return this.summary; }
 	public String getSourceURL() { return this.sourceURL; }
 
-	public void setID(int id) { this.id = id; }
 	public void setName(String name) { this.name = name; }
 	public void setSummary(Summary summary) { this.summary = summary; }
 	public void setSourceURL(String sourceURL) { this.sourceURL = sourceURL; }

@@ -4,6 +4,7 @@ package yasp.group.service;
 import javax.ejb.*;
 import javax.persistence.*;
 import java.util.List;
+import java.util.ArrayList;
 import yasp.group.entity.*;
 
 @Local
@@ -14,32 +15,71 @@ public class Service {
 	private EntityManager manager;
 
 	public List<License> getAllLicenses() {
-		List<License> result = manager.createQuery("SELECT license FROM License license").getResultList();
+		List<License> result = manager.createQuery("SELECT l FROM License l").getResultList();
 		return result;
 	}
 
 	public List<Summary> getAllSummary() {
-		List<Summary> result = manager.createQuery("SELECT summary FROM Summary summary").getResultList();
+		List<Summary> result = manager.createQuery("SELECT l FROM Summary s").getResultList();
 		return result;
 	}
 
 	public List<LicenseSummary> getAllLicenseSummary() {
-		List<LicenseSummary> result = manager.createQuery("SELECT licenseSummary FROM LicenseSummary licenseSummary").getResultList();
+		List<LicenseSummary> result = manager.createQuery("SELECT ls FROM LicenseSummary ls").getResultList();
 		return result;
 	}
 
 	public License getLicenseById(int id) {
-		License result = manager.createQuery("SELECT license FROM License license WHERE license.id = :id", License.class).setParameter("id", id).getResultList().get(0);
-		return result;
+		try {
+			License result =
+				manager.createQuery("SELECT l FROM License l WHERE l.id = :id", License.class)
+				.setParameter("id", id)
+				.getResultList().get(0);
+			return result;
+		} catch (IndexOutOfBoundsException e) {
+			// No result; return NULL.
+			return null;
+		}
 	}
 
 	public Summary getSummaryById(int id) {
-		Summary result = manager.createQuery("SELECT summary FROM Summary summary WHERE summary.id = :id", Summary.class).setParameter("id", id).getResultList().get(0);
-		return result;
+		try {
+			Summary result =
+				manager.createQuery("SELECT s FROM Summary s WHERE s.id = :id", Summary.class)
+				.setParameter("id", id)
+				.getResultList().get(0);
+			return result;
+		} catch (IndexOutOfBoundsException e) {
+			// No result; return NULL.
+			return null;
+		}
 	}
 
 	public LicenseSummary getLicenseSummaryById(int id) {
-		LicenseSummary result = manager.createQuery("SELECT licenseSummary FROM LicenseSummary licenseSummary WHERE LicenseSummary.id = :id", LicenseSummary.class).setParameter("id", id).getResultList().get(0);
+		try {
+			LicenseSummary result =
+				manager.createQuery("SELECT ls FROM LicenseSummary ls WHERE ls.id = :id", LicenseSummary.class)
+				.setParameter("id", id)
+				.getResultList().get(0);
+			return result;
+		} catch (IndexOutOfBoundsException e) {
+			// No result; return NULL.
+			return null;
+		}
+	}
+
+	public List<Summary> getSummaryFromLicense(License license) {
+		List<LicenseSummary> list =
+			manager.createQuery("SELECT ls FROM LicenseSummary ls WHERE ls.license = :id", LicenseSummary.class)
+			.setParameter("id", license.getID())
+			.getResultList();
+		List<Summary> result = new ArrayList<Summary>();
+		for (int i = 0; i < list.size(); i++) {
+			result.add(
+				manager.createQuery("SELECT s FROM Summary s WHERE s.id = :id", Summary.class)
+					.setParameter("id", list.get(i).getSummary())
+					.getResultList().get(0));
+		}
 		return result;
 	}
 
@@ -56,14 +96,14 @@ public class Service {
 	}
 
 	public void deleteLicense(int id) {
-		manager.createQuery("DELETE FROM License license WHERE license.id = :id").setParameter("id", id).executeUpdate();
+		manager.createQuery("DELETE FROM License l WHERE l.id = :id").setParameter("id", id).executeUpdate();
 	}
 
 	public void deleteSummary(int id) {
-		manager.createQuery("DELETE FROM Summary summary WHERE summary.id = :id").setParameter("id", id).executeUpdate();
+		manager.createQuery("DELETE FROM Summary s WHERE s.id = :id").setParameter("id", id).executeUpdate();
 	}
 
 	public void deleteLicenseSummary(int id) {
-		manager.createQuery("DELETE FROM LicenseSummary licenseSummary WHERE licenseSummary.id = :id").setParameter("id", id).executeUpdate();
+		manager.createQuery("DELETE FROM LicenseSummary ls WHERE ls.id = :id").setParameter("id", id).executeUpdate();
 	}
 }

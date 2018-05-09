@@ -21,17 +21,15 @@ public class Summary implements Serializable {
 	public Summary() {
 	}
 
-	public Summary(int id, String name, String description) {
-		this.id = id;
+	public Summary(String name, String description) {
 		this.name = name;
 		this.description = description;
 	}
 
-	public int getID() { return this.id; }
+	public int getId() { return this.id; }
 	public String getName() { return this.name; }
 	public String getDescription() { return this.description; }
 
-	public void setID(int id) { this.id = id; }
 	public void setName(String name) { this.name = name; }
 	public void setDescription(String description) { this.description = description; }
 }
