@@ -13,23 +13,24 @@ public class LicenseSummary implements Serializable {
 	@Column(name="id", nullable=false)
 	private int id;
 
-	@JoinColumn
-	private License license;
+	@JoinColumn(table="license",columnDefinition="id")
+	private int license;
 
-	@Column(name="summary")
-	@OneToMany(mappedBy="id")
-	private List<Summary> summary;
+	@JoinColumn(table="summary",columnDefinition="id")
+	private int summary;
 
 	public LicenseSummary() {
 	}
 
-	public LicenseSummary(License license, List<Summary> summary) {
+	public LicenseSummary(int license, int summary) {
 		this.license = license;
 		this.summary = summary;
 	}
 
-	public License getLicense() { return this.license; }
-	public List<Summary> getSummary() { return this.summary; }
-	public void setLicense(License license) { this.license = license; }
-	public void setSummary(List<Summary> summary) { this.summary = summary; }
+	public int getId() { return this.id; }
+	public int getLicense() { return this.license; }
+	public int getSummary() { return this.summary; }
+
+	public void setLicense(int license) { this.license = license; }
+	public void setSummary(int summary) { this.summary = summary; }
 }
