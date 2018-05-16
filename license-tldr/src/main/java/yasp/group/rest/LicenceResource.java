@@ -17,6 +17,7 @@ public class LicenceResource {
 	@Inject
 	private Service service;
 
+	//Licences
 	@GET
 	@Path("/license")
 	@Produces("application/json")
@@ -24,7 +25,17 @@ public class LicenceResource {
 		List<License> result = service.getAllLicenses();
 			return Response.ok(result).build();
 	}
+	@GET
+	@Path("/license/{id}")
+    @Produces("application/json")
+	public Response getLicenseById(@PathParam("id") int id) {
+		License result = service.getLicenseById(id);
+		return Response.ok(result).build();
+	}
 
+
+
+	//Summaries
 	@GET
 	@Path("/summary")
 	@Produces("application/json")
@@ -32,39 +43,53 @@ public class LicenceResource {
 		List<Summary> result = service.getAllSummary();
 		return Response.ok(result).build();
 	}
-
 	@GET
-	@Produces("application/json")
-	@Path("/license/{licenseId}")
-	public Response getLicenseById(@PathParam("licenseId") int id) {
-			License result = service.getLicenseById(id);
-			return Response.ok(result).build();
-	}
-	@GET
-	@Produces("application/json")
-	@Path("/summary/{summaryId}")
-	public Response getSummaryById(@PathParam("summaryId") int id) {
+	@Path("/summary/{id}")
+    @Produces("application/json")
+	public Response getSummaryById(@PathParam("id") int id) {
 		Summary result = service.getSummaryById(id);
 		return Response.ok(result).build();
 	}
-
 	@GET
+	@Path("/sumFromLic/{id}")
+    @Produces("application/json")
+	public Response getSummaryFromLicense(@PathParam("id") int id) {
+		License l = service.getLicenseById(id);
+		List<Summary> result = service.getSummaryFromLicense(l);
+		return Response.ok(result).build();
+	}
+	@GET
+	@Path("/sumfromlicId/{id}")
+    @Produces("application/json")
+	public Response getSummaryByLicenseId(@PathParam("id") int id) {
+		List<Summary> result = service.getSummaryFromLicense(id);
+		return Response.ok(result).build();
+	}
+
+
+
+	//LicenseSummary
+	@GET
+	@Path("/licsum")
 	@Produces("application/json")
-	@Path("/licsum/{LicSumId}")
-	public Response getLicenseSummary(@PathParam("LicSumId") int id) {
+	public Response getAllLicenseSummary(){
+		List<LicenseSummary> result = service.getAllLicenseSummary();
+		return Response.ok(result).build();
+	}
+	@GET
+	@Path("/licsum/{id}")
+    @Produces("application/json")
+	public Response getLicenseSummaryById(@PathParam("id") int id) {
 		LicenseSummary result = service.getLicenseSummaryById(id);
 		return Response.ok(result).build();
 	}
 
-	@GET
-	@Produces("application/json")
-	@Path("/sumfromlic/{SumFromLicId}")
-	public Response getSummaryByLicenseId(@PathParam("SumFromLicId") int id) {
-		List<Summary> result = service.getSummaryFromLicense(id);
-		return Response.ok(result).build();
-	}
+
+
+	//POST
 	@POST
 	@Path("/license/{createLicense}")
+    @Consumes("application/json")
 	public Response createLicense(@PathParam("createLicense")JSONObject json) {
 		License license = new License(json.getString("name"),json.getString("sourceURL"));
 		service.createLicense(license);
@@ -72,18 +97,64 @@ public class LicenceResource {
 	}
 
 	@POST
-	@Consumes("application/json")
 	@Path("/summary/{createSummary}")
+    @Consumes("application/json")
 	public Response createSummary(@PathParam("createSummary")JSONObject json) {
 		Summary summary = new Summary(json.getString("name"),json.getString("description"));
 		service.createSummary(summary);
 		return Response.ok().build();
 	}
 
+
+	//PUT
+    @PUT
+    @Path("/editLicense/{license}")
+    @Consumes("application/json")
+    public Response editLicense(@PathParam("license") JSONObject json){
+	    License l = service.getLicenseById(json.getInt("id"));
+	    l.setName(json.getString("name"));
+	    l.setSourceURL(json.getString("sourceURL"));
+	    service.applyLicenseChanges(l);
+	    return Response.ok().build();
+    }
+    @PUT
+    @Path("/editSummary/{summary}")
+    @Consumes("application/json")
+    public Response editSummary(@PathParam("summary") JSONObject json){
+        Summary s = service.getSummaryById(json.getInt("id"));
+        s.setName(json.getString("name"));
+        s.setDescription(json.getString("description"));
+        service.applySummaryChanges(s);
+        return Response.ok().build();
+    }
+
+
+    //DELETE
+    @DELETE
+    @Path("/del/li/{id}")
+    public Response deleteLicense(@PathParam("id") int id){
+	    service.deleteLicense(id);
+	    return Response.ok().build();
+    }
+    @DELETE
+    @Path("/del/su/{id}")
+    public Response deleteSummary(@PathParam("id") int id){
+        service.deleteSummary(id);
+        return Response.ok().build();
+    }
+    @DELETE
+    @Path("/del/lisu/{id}")
+    public Response deleteLicenseSummary(@PathParam("id") int id){
+        service.deleteLicenseSummary(id);
+        return Response.ok().build();
+    }
+
+
+
 	//TestMethod
 	@POST
-	@Produces("application/json")
 	@Path("/test")
+    @Produces("application/json")
 	public Response createTest() {
 		Summary summary = new Summary("TestSummary", "Ipsum Testum");
 		License license = new License("TestLicence","http://www.Thisgoesnowhere.now");
@@ -92,52 +163,6 @@ public class LicenceResource {
 		LicenseSummary ls = (new LicenseSummary(license.getId(),summary.getId()));
 		service.createLicenseSummary(ls);
 
-		return Response.ok(ls).build();
-	}
-
-	/*
-	@POST
-	@Path("{createLicSum}")
-	public Response createLicenseSummary(@PathParam("createLicSum")JSONObject json) {
-		License license = new License(json.)
-		LicenseSummary ls = new LicenseSummary()
-		Summary summary = new Summary(json.getString("name"),json.getString("description"));
-		service.createSummary(summary);
 		return Response.ok().build();
 	}
-	*/
-
-	/*
-	//Necessary?
-	@GET
-	@Produces("application/json")
-	@Path("{SumFromLic}")
-	public Response getSummaryByLicense(@PathParam("SumFromLic") License license) {
-		List<Summary> result = service.getSummaryFromLicense(license);
-		return Response.ok(result).build();
-	}
-	*/
-	/*
-	@PUT
-	@Path("{editLicense}")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public Response applyLicenseChanges (@PathParam("editLicense") int id) {
-			service.applyLicenseChanges(getLicenseById(id));
-			return Response.ok(service.getById(id)).build();
-		}
-
-	@PUT
-	@Path("{edit}")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public Response editLicense (@PathParam("edit") int id, License l) {
-		try {
-			service.editLicense(id, l.getName(), l.getSummary(), l.getSourceURL());
-			return Response.ok(service.getById(id)).build();
-		}catch (LicenseNotFoundException e){
-			return Response.status(404).build();
-		}
-	}
-	*/
 }
