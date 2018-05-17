@@ -1,7 +1,6 @@
 package yasp.group.rest;
 import org.json.JSONObject;
 import yasp.group.entity.License;
-import yasp.group.entity.LicenseSummary;
 import yasp.group.entity.Summary;
 import yasp.group.service.Service;
 
@@ -10,6 +9,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.inject.Inject;
 import java.util.List;
+import java.util.ArrayList;
 
 @Stateless
 @Path("/licenses")
@@ -40,7 +40,7 @@ public class LicenceResource {
 	@Path("/summary")
 	@Produces("application/json")
 	public Response getAllSummary(){
-		List<Summary> result = service.getAllSummary();
+		List<Summary> result = service.getAllSummaries();
 		return Response.ok(result).build();
 	}
 	@GET
@@ -55,35 +55,16 @@ public class LicenceResource {
     @Produces("application/json")
 	public Response getSummaryFromLicense(@PathParam("id") int id) {
 		License l = service.getLicenseById(id);
-		List<Summary> result = service.getSummaryFromLicense(l);
+		List<Summary> result = service.getSummariesFromLicense(l.getId());
 		return Response.ok(result).build();
 	}
 	@GET
 	@Path("/sumfromlicId/{id}")
     @Produces("application/json")
 	public Response getSummaryByLicenseId(@PathParam("id") int id) {
-		List<Summary> result = service.getSummaryFromLicense(id);
+		List<Summary> result = service.getSummariesFromLicense(id);
 		return Response.ok(result).build();
 	}
-
-
-
-	//LicenseSummary
-	@GET
-	@Path("/licsum")
-	@Produces("application/json")
-	public Response getAllLicenseSummary(){
-		List<LicenseSummary> result = service.getAllLicenseSummary();
-		return Response.ok(result).build();
-	}
-	@GET
-	@Path("/licsum/{id}")
-    @Produces("application/json")
-	public Response getLicenseSummaryById(@PathParam("id") int id) {
-		LicenseSummary result = service.getLicenseSummaryById(id);
-		return Response.ok(result).build();
-	}
-
 
 
 	//POST
@@ -94,25 +75,22 @@ public class LicenceResource {
 	    try {
             License license = new License(json.getString("name"), json.getString("sourceURL"));
             service.createLicense(license);
-            return Response.ok().build();ls
+            return Response.ok().build();
         }catch (Exception e){
-            Response.status(400).build();
+            return Response.status(400).build();
         }
 	}
 
 	@POST
-	@Path("/summary/{summaryjson}/{liId}")
+	@Path("/summary/{summaryjson}")
     @Consumes("application/json")
-	public Response createSummary(@PathParam("summaryjson")JSONObject json,
-								  @PathParam("liId") int id) {
+	public Response createSummary(@PathParam("summaryjson")JSONObject json) {
 	    try {
             Summary summary = new Summary(json.getString("name"),json.getString("description"));
-            LicenseSummary ls = new LicenseSummary(id,summary.getId());
             service.createSummary(summary);
-            service.createLicenseSummary(ls);
             return Response.ok().build();
         }catch (Exception e){
-	        Response.status(400).build();
+	        return Response.status(400).build();
         }
 	}
 
@@ -153,13 +131,6 @@ public class LicenceResource {
         service.deleteSummary(id);
         return Response.ok().build();
     }
-    @DELETE
-    @Path("/del/lisu/{id}")
-    public Response deleteLicenseSummary(@PathParam("id") int id){
-        service.deleteLicenseSummary(id);
-        return Response.ok().build();
-    }
-
 
 
 	//TestMethod
@@ -170,10 +141,9 @@ public class LicenceResource {
 		Summary summary = new Summary("TestSummary", "Ipsum Testum");
 		License license = new License("TestLicence","http://www.Thisgoesnowhere.now");
 		service.createSummary(summary);
-		service.createLicense(license);
-		LicenseSummary ls = (new LicenseSummary(license.getId(),summary.getId()));
-		service.createLicenseSummary(ls);
-
-		return Response.ok().build();
+		List<Summary> sum = new ArrayList<>();
+		sum.add(summary);
+		service.createLicenseFromSummaries(license, sum);
+		return Response.ok(license).build();
 	}
 }
