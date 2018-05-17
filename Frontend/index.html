@@ -25,6 +25,46 @@
 
     </div>
   </header>
+
+
+<script>
+
+let request = new Request('http://localhost:8080/license-tldr-1.0-SNAPSHOT/api/licenses/license', {
+    headers: new Headers({
+        'Content-Type': 'text/json'
+    }),
+    method: 'GET'
+});
+
+fetch(request).then((response) => {
+  return response.json();
+}).then((result) => {
+  console.log(result);
+});
+
+
+</script>
+
 </body>
 
 </html>
+
+<!--
+
+const url = 'https://randomuser.me/api';
+// The data we are going to send in our request
+let data = {
+    name: 'Sara'
+}
+// The parameters we are gonna pass to the fetch function
+let fetchData = {
+    method: 'POST',
+    body: data,
+    headers: new Headers()
+}
+fetch(url, fetchData)
+.then(function() {
+    // Handle response you get from the server
+});
+
+-->
