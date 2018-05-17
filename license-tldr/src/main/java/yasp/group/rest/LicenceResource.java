@@ -80,6 +80,7 @@ public class LicenceResource {
 	public Response createTest() {
 		Summary summary = new Summary("TestSummary", "Ipsum Testum");
 		License license = new License("TestLicence","http://www.Thisgoesnowhere.now");
+		service.createSummary(summary);
 		List<Summary> sum = new ArrayList<>();
 		sum.add(summary);
 		service.createLicenseFromSummaries(license, sum);
