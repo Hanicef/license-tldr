@@ -5,13 +5,13 @@ import yasp.group.entity.LicenseSummary;
 import yasp.group.entity.Summary;
 import yasp.group.service.Service;
 
-import javax.ejb.Singleton;
+import javax.ejb.Stateless;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.inject.Inject;
 import java.util.List;
 
-@Singleton
+@Stateless
 @Path("/licenses")
 public class LicenceResource {
 	@Inject
@@ -91,18 +91,29 @@ public class LicenceResource {
 	@Path("/license/{createLicense}")
     @Consumes("application/json")
 	public Response createLicense(@PathParam("createLicense")JSONObject json) {
-		License license = new License(json.getString("name"),json.getString("sourceURL"));
-		service.createLicense(license);
-		return Response.ok().build();
+	    try {
+            License license = new License(json.getString("name"), json.getString("sourceURL"));
+            service.createLicense(license);
+            return Response.ok().build();ls
+        }catch (Exception e){
+            Response.status(400).build();
+        }
 	}
 
 	@POST
-	@Path("/summary/{createSummary}")
+	@Path("/summary/{summaryjson}/{liId}")
     @Consumes("application/json")
-	public Response createSummary(@PathParam("createSummary")JSONObject json) {
-		Summary summary = new Summary(json.getString("name"),json.getString("description"));
-		service.createSummary(summary);
-		return Response.ok().build();
+	public Response createSummary(@PathParam("summaryjson")JSONObject json,
+								  @PathParam("liId") int id) {
+	    try {
+            Summary summary = new Summary(json.getString("name"),json.getString("description"));
+            LicenseSummary ls = new LicenseSummary(id,summary.getId());
+            service.createSummary(summary);
+            service.createLicenseSummary(ls);
+            return Response.ok().build();
+        }catch (Exception e){
+	        Response.status(400).build();
+        }
 	}
 
 
