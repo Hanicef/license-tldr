@@ -71,7 +71,6 @@ public class Service {
 	public void createLicenseFromSummaries(License license, List<Summary> summaries) {
 		dao.createLicense(license);
 		for (int i = 0; i < summaries.size(); i++) {
-			dao.createSummary(summaries.get(i));
 			dao.createLicenseSummary(new LicenseSummary(license.getId(), summaries.get(i).getId()));
 		}
 	}
