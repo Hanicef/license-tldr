@@ -89,6 +89,23 @@ public class Service {
 		return result;
 	}
 
+	public List<License> getLicenseFromSummary(int id) {
+		List<LicenseSummary> list =
+			manager.createQuery("SELECT ls FROM LicenseSummary ls WHERE ls.summary = :id", LicenseSummary.class)
+			.setParameter("id", id)
+			.getResultList();
+
+		List<License> result = new ArrayList<License>();
+		for (int i = 0; i < list.size(); i++) {
+			// Foreign key: will not cause IndexOutOfBoundsException.
+			result.add(
+				manager.createQuery("SELECT l FROM License l WHERE l.id = :id", License.class)
+					.setParameter("id", list.get(i).getLicense())
+					.getResultList().get(0));
+		}
+		return result;
+	}
+
 	public void createLicense(License license) {
 		manager.persist(license);
 	}
