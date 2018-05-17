@@ -101,6 +101,15 @@ public class Service {
 		manager.persist(licenseSummary);
 	}
 
+	public LicenseSummary createLicenseAndSummary(License license, Summary summary) {
+		manager.persist(license);
+		manager.persist(summary);
+
+		LicenseSummary licenseSummary = new LicenseSummary(licence.id, summary.id);
+		manager.persist(licenseSummary);
+		return licenseSummary;
+	}
+
 	public void applyLicenseChanges(License license) {
 		manager.createQuery("UPDATE License l SET l.name = :name, l.sourceURL = :sourceURL WHERE l.id = :id")
 			.setParameter("name", license.getName())
