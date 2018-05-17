@@ -122,7 +122,9 @@ public class Service {
 		manager.persist(license);
 		manager.persist(summary);
 
-		LicenseSummary licenseSummary = new LicenseSummary(licence.id, summary.id);
+		// Must allocate licenseSummary after persisting license and summary!
+		// Otherwise, the ID might be incorrect.
+		LicenseSummary licenseSummary = new LicenseSummary(license.getId(), summary.getId());
 		manager.persist(licenseSummary);
 		return licenseSummary;
 	}
