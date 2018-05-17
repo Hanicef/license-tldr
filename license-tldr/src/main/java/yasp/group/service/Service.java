@@ -2,7 +2,7 @@
 package yasp.group.service;
 
 import javax.ejb.*;
-import javax.persistence.*;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.ArrayList;
 import yasp.group.entity.*;
@@ -11,149 +11,92 @@ import yasp.group.entity.*;
 @Stateless
 public class Service {
 
-	@PersistenceContext
-	private EntityManager manager;
+	@Inject
+	private DataAccess dao;
 
 	public List<License> getAllLicenses() {
-		List<License> result = manager.createQuery("SELECT l FROM License l").getResultList();
-		return result;
+		return dao.getAllLicenses();
 	}
 
-	public List<Summary> getAllSummary() {
-		List<Summary> result = manager.createQuery("SELECT s FROM Summary s").getResultList();
-		return result;
-	}
-
-	public List<LicenseSummary> getAllLicenseSummary() {
-		List<LicenseSummary> result = manager.createQuery("SELECT ls FROM LicenseSummary ls").getResultList();
-		return result;
+	public List<Summary> getAllSummaries() {
+		return dao.getAllSummaries();
 	}
 
 	public License getLicenseById(int id) {
-		try {
-			License result =
-				manager.createQuery("SELECT l FROM License l WHERE l.id = :id", License.class)
-				.setParameter("id", id)
-				.getResultList().get(0);
-			return result;
-		} catch (IndexOutOfBoundsException e) {
-			// No result; return NULL.
-			return null;
-		}
+		return dao.getLicenseById(id);
 	}
 
 	public Summary getSummaryById(int id) {
-		try {
-			Summary result =
-				manager.createQuery("SELECT s FROM Summary s WHERE s.id = :id", Summary.class)
-				.setParameter("id", id)
-				.getResultList().get(0);
-			return result;
-		} catch (IndexOutOfBoundsException e) {
-			// No result; return NULL.
-			return null;
-		}
+		return dao.getSummaryById(id);
 	}
 
-	public LicenseSummary getLicenseSummaryById(int id) {
-		try {
-			LicenseSummary result =
-				manager.createQuery("SELECT ls FROM LicenseSummary ls WHERE ls.id = :id", LicenseSummary.class)
-				.setParameter("id", id)
-				.getResultList().get(0);
-			return result;
-		} catch (IndexOutOfBoundsException e) {
-			// No result; return NULL.
-			return null;
-		}
+	public List<Summary> getSummariesFromLicense(License license) {
+		return this.getSummariesFromLicense(license.getId());
 	}
 
-	public List<Summary> getSummaryFromLicense(License license) {
-		return this.getSummaryFromLicense(license.getId());
-	}
-
-	public List<Summary> getSummaryFromLicense(int id) {
-		List<LicenseSummary> list =
-			manager.createQuery("SELECT ls FROM LicenseSummary ls WHERE ls.license = :id", LicenseSummary.class)
-			.setParameter("id", id)
-			.getResultList();
+	public List<Summary> getSummariesFromLicense(int id) {
+		List<LicenseSummary> list = dao.getAllLicenseSummaries();
 
 		List<Summary> result = new ArrayList<Summary>();
 		for (int i = 0; i < list.size(); i++) {
 			// Foreign key: will not cause IndexOutOfBoundsException.
-			result.add(
-				manager.createQuery("SELECT s FROM Summary s WHERE s.id = :id", Summary.class)
-					.setParameter("id", list.get(i).getSummary())
-					.getResultList().get(0));
+			result.add(dao.getSummaryById(list.get(i).getSummary()));
 		}
 		return result;
 	}
 
-	public List<License> getLicenseFromSummary(int id) {
-		List<LicenseSummary> list =
-			manager.createQuery("SELECT ls FROM LicenseSummary ls WHERE ls.summary = :id", LicenseSummary.class)
-			.setParameter("id", id)
-			.getResultList();
+	public List<License> getLicensesFromSummary(int id) {
+		List<LicenseSummary> list = dao.getAllLicenseSummaries();
 
 		List<License> result = new ArrayList<License>();
 		for (int i = 0; i < list.size(); i++) {
 			// Foreign key: will not cause IndexOutOfBoundsException.
-			result.add(
-				manager.createQuery("SELECT l FROM License l WHERE l.id = :id", License.class)
-					.setParameter("id", list.get(i).getLicense())
-					.getResultList().get(0));
+			result.add(dao.getLicenseById(list.get(i).getLicense()));
 		}
 		return result;
 	}
 
 	public void createLicense(License license) {
-		manager.persist(license);
+		dao.createLicense(license);
 	}
 
 	public void createSummary(Summary summary) {
-		manager.persist(summary);
+		dao.createSummary(summary);
 	}
 
-	public void createLicenseSummary(LicenseSummary licenseSummary) {
-		manager.persist(licenseSummary);
+	public void addSummaryToLicense(License license, Summary summary) {
+		dao.createLicenseSummary(new LicenseSummary(license.getId(), summary.getId()));
 	}
 
-	public LicenseSummary createLicenseAndSummary(License license, Summary summary) {
-		manager.persist(license);
-		manager.persist(summary);
-
-		// Must allocate licenseSummary after persisting license and summary!
-		// Otherwise, the ID might be incorrect.
-		LicenseSummary licenseSummary = new LicenseSummary(license.getId(), summary.getId());
-		manager.persist(licenseSummary);
-		return licenseSummary;
+	public void createLicenseFromSummaries(License license, List<Summary> summaries) {
+		dao.createLicense(license);
+		for (int i = 0; i < summaries.size(); i++) {
+			dao.createSummary(summaries.get(i));
+			dao.createLicenseSummary(new LicenseSummary(license.getId(), summaries.get(i).getId()));
+		}
 	}
 
 	public void applyLicenseChanges(License license) {
-		manager.createQuery("UPDATE License l SET l.name = :name, l.sourceURL = :sourceURL WHERE l.id = :id")
-			.setParameter("name", license.getName())
-			.setParameter("sourceURL", license.getSourceURL())
-			.setParameter("id", license.getId())
-			.executeUpdate();
+		dao.applyLicenseChanges(license);
 	}
 
 	public void applySummaryChanges(Summary summary) {
-		manager.createQuery("UPDATE Summary s SET s.name = :name, s.description = :description WHERE s.id = :id")
-			.setParameter("name", summary.getName())
-			.setParameter("description", summary.getDescription())
-			.setParameter("id", summary.getId())
-			.executeUpdate();
+		dao.applySummaryChanges(summary);
 	}
+
+	public void deleteLicense(License license) { this.deleteLicense(license.getId()); }
 
 	public void deleteLicense(int id) {
-		manager.createQuery("DELETE FROM License l WHERE l.id = :id").setParameter("id", id).executeUpdate();
+		// Remove all licenseSummaries that corresponds with the to-be-deleted license first.
+		dao.deleteLicenseConnections(id);
+		dao.deleteLicense(id);
 	}
+
+	public void deleteSummary(Summary summary) { this.deleteSummary(summary.getId()); }
 
 	public void deleteSummary(int id) {
-		manager.createQuery("DELETE FROM Summary s WHERE s.id = :id").setParameter("id", id).executeUpdate();
-	}
-
-	public void deleteLicenseSummary(int id) {
-		manager.createQuery("DELETE FROM LicenseSummary ls WHERE ls.id = :id").setParameter("id", id).executeUpdate();
+		// Remove all licenseSummaries that corresponds with the to-be-deleted summary first.
+		dao.deleteSummaryConnections(id);
+		dao.deleteSummary(id);
 	}
 }

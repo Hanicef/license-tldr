@@ -10,6 +10,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.inject.Inject;
 import java.util.List;
+import java.util.ArrayList;
 
 @Singleton
 @Path("/licenses")
@@ -29,7 +30,7 @@ public class LicenceResource {
 	@Path("/summary")
 	@Produces("application/json")
 	public Response getAllSummary(){
-		List<Summary> result = service.getAllSummary();
+		List<Summary> result = service.getAllSummaries();
 		return Response.ok(result).build();
 	}
 
@@ -50,17 +51,9 @@ public class LicenceResource {
 
 	@GET
 	@Produces("application/json")
-	@Path("/licsum/{LicSumId}")
-	public Response getLicenseSummary(@PathParam("LicSumId") int id) {
-		LicenseSummary result = service.getLicenseSummaryById(id);
-		return Response.ok(result).build();
-	}
-
-	@GET
-	@Produces("application/json")
 	@Path("/sumfromlic/{SumFromLicId}")
 	public Response getSummaryByLicenseId(@PathParam("SumFromLicId") int id) {
-		List<Summary> result = service.getSummaryFromLicense(id);
+		List<Summary> result = service.getSummariesFromLicense(id);
 		return Response.ok(result).build();
 	}
 	@POST
@@ -87,12 +80,11 @@ public class LicenceResource {
 	public Response createTest() {
 		Summary summary = new Summary("TestSummary", "Ipsum Testum");
 		License license = new License("TestLicence","http://www.Thisgoesnowhere.now");
-		service.createSummary(summary);
-		service.createLicense(license);
-		LicenseSummary ls = (new LicenseSummary(license.getId(),summary.getId()));
-		service.createLicenseSummary(ls);
+		List<Summary> sum = new ArrayList<>();
+		sum.add(summary);
+		service.createLicenseFromSummaries(license, sum);
 
-		return Response.ok(ls).build();
+		return Response.ok(license).build();
 	}
 
 	/*
