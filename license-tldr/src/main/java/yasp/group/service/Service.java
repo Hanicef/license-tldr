@@ -22,13 +22,13 @@ public class Service {
 		return dao.getAllSummaries();
 	}
 
-	public License getLicenseById(int id) {
+	public License getLicenseById(int id) throws ServiceException {
 		License license = dao.getLicenseById(id);
 		if (license == null) throw new ServiceException("license", id, "Row not found");
 		return license;
 	}
 
-	public Summary getSummaryById(int id) {
+	public Summary getSummaryById(int id) throws ServiceException {
 		Summary summary = dao.getSummaryById(id);
 		if (summary == null) throw new ServiceException("summary", id, "Row not found");
 		return summary;
@@ -43,10 +43,16 @@ public class Service {
 
 		List<Summary> result = new ArrayList<Summary>();
 		for (int i = 0; i < list.size(); i++) {
-			// Foreign key: will not cause IndexOutOfBoundsException.
-			result.add(dao.getSummaryById(list.get(i).getSummary()));
+			if (list.get(i).getLicense() == id) {
+				// Foreign key: will not cause IndexOutOfBoundsException.
+				result.add(dao.getSummaryById(list.get(i).getSummary()));
+			}
 		}
 		return result;
+	}
+
+	public List<License> getLicensesFromSummary(Summary summary) {
+		return this.getLicensesFromSummary(summary.getId());
 	}
 
 	public List<License> getLicensesFromSummary(int id) {
@@ -54,8 +60,10 @@ public class Service {
 
 		List<License> result = new ArrayList<License>();
 		for (int i = 0; i < list.size(); i++) {
-			// Foreign key: will not cause IndexOutOfBoundsException.
-			result.add(dao.getLicenseById(list.get(i).getLicense()));
+			if (list.get(i).getSummary() == id) {
+				// Foreign key: will not cause IndexOutOfBoundsException.
+				result.add(dao.getLicenseById(list.get(i).getLicense()));
+			}
 		}
 		return result;
 	}
