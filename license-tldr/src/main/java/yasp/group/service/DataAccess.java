@@ -76,7 +76,11 @@ public class DataAccess {
 	}
 
 	public void createLicenseSummary(LicenseSummary licenseSummary) {
-		manager.persist(licenseSummary);
+		try {
+			manager.persist(licenseSummary);
+		} catch (EntityExistsException e) {
+			// Ignore if the connection already exist; the result will be the same regardless.
+		}
 	}
 
 

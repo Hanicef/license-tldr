@@ -6,15 +6,13 @@ import yasp.group.entity.Summary;
 import yasp.group.service.Service;
 import yasp.group.service.ServiceException;
 
-import javax.ejb.EJBException;
+import javax.ejb.EJBTransactionRolledbackException;
 import javax.ejb.Stateless;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.inject.Inject;
-import java.security.InvalidParameterException;
 import java.util.List;
-import java.util.ArrayList;
 
 @Stateless
 @Path("/licenses")
@@ -33,7 +31,7 @@ public class LicenceResource {
 	@GET
 	@Path("/license/{id}")
 	@Produces("application/json")
-	public Response getLicenseById(@PathParam("id") int id) {
+	public Response getLicenseById(@PathParam("id") int id) throws ServiceException {
 		License result = service.getLicenseById(id);
 		return Response.ok(result).build();
 	}
@@ -47,8 +45,7 @@ public class LicenceResource {
 			Summary s = service.getSummaryById(json.getInt("id"));
 			List<License> result = service.getLicensesFromSummary(s);
 			return Response.ok(result).build();
-		}catch (EJBException e){
-			System.err.println("provided ID does not exist");
+		}catch (ServiceException e){
 			return Response.status(400).build();
 		}
 	}
@@ -73,7 +70,7 @@ public class LicenceResource {
 	@GET
 	@Path("/summary/{id}")
 	@Produces("application/json")
-	public Response getSummaryById(@PathParam("id") int id) {
+	public Response getSummaryById(@PathParam("id") int id) throws ServiceException {
 		Summary result = service.getSummaryById(id);
 		return Response.ok(result).build();
 	}
@@ -87,8 +84,7 @@ public class LicenceResource {
 			License l = service.getLicenseById(json.getInt("id"));
 			List<Summary> result = service.getSummariesFromLicense(l);
 			return Response.ok(result).build();
-		}catch (EJBException e){
-			System.err.println("provided ID does not exist");
+		}catch (ServiceException e){
 			return Response.status(400).build();
 		}
 	}
@@ -115,8 +111,6 @@ public class LicenceResource {
 		}catch (JSONException e){
 			System.err.println("Invalid json format" + e);
 			return Response.status(400).build();
-		}catch (ServiceException e){
-			return Response.status(400).build();
 		}
 	}
 
@@ -133,8 +127,6 @@ public class LicenceResource {
 		}catch (JSONException e){
 			System.err.println("Invalid json format" + e);
 			return Response.status(400).build();
-		}catch (ServiceException e){
-			return Response.status(400).build();
 		}
 	}
 	@GET
@@ -146,7 +138,7 @@ public class LicenceResource {
 			Summary summary = service.getSummaryById(sId);
 			service.addSummaryToLicense(license, summary);
 			return Response.ok().build();
-		}catch (ServiceException e){
+		}catch (ServiceException | EJBTransactionRolledbackException e){
 			return Response.status(400).build();
 		}
 	}
@@ -157,7 +149,7 @@ public class LicenceResource {
 	@PUT
 	@Path("/editlicense")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response editLicense(String sJson){
+	public Response editLicense(String sJson) throws ServiceException {
 		JSONObject json = new JSONObject(sJson);
 		License l = service.getLicenseById(json.getInt("id"));
 		l.setName(json.getString("name"));
@@ -168,7 +160,7 @@ public class LicenceResource {
 	@PUT
 	@Path("/editsummary")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response editSummary(String sJson){
+	public Response editSummary(String sJson) throws ServiceException {
 		JSONObject json = new JSONObject(sJson);
 		Summary s = service.getSummaryById(json.getInt("id"));
 		s.setName(json.getString("name"));
