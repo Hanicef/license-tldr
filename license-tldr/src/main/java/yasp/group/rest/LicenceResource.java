@@ -37,8 +37,6 @@ public class LicenceResource {
 		License result = service.getLicenseById(id);
 		return Response.ok(result).build();
 	}
-	//NOT IMPLEMENTED IN DAO
-	/*
 	@GET
 	@Path("/licfromsum")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -53,7 +51,7 @@ public class LicenceResource {
 			System.err.println("provided ID does not exist");
 			return Response.status(400).build();
 		}
-	}*/
+	}
 	@GET
 	@Path("/licfromsumId/{id}")
 	@Produces("application/json")
