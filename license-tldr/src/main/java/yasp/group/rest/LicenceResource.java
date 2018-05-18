@@ -1,11 +1,14 @@
 package yasp.group.rest;
+import org.json.JSONException;
 import org.json.JSONObject;
 import yasp.group.entity.License;
 import yasp.group.entity.Summary;
 import yasp.group.service.Service;
 
+import javax.ejb.EJBException;
 import javax.ejb.Stateless;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.inject.Inject;
 import java.util.List;
@@ -32,6 +35,23 @@ public class LicenceResource {
 		License result = service.getLicenseById(id);
 		return Response.ok(result).build();
 	}
+	//NOT IMPLEMENTED IN DAO
+	/*
+	@GET
+	@Path("/licfromsum")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces("application/json")
+	public Response getLicensesFromSummary(String sJson) {
+		try {
+			JSONObject json = new JSONObject(sJson);
+			Summary s = service.getSummaryById(json.getInt("id"));
+			List<License> result = service.getLicensesFromSummary(s);
+			return Response.ok(result).build();
+		}catch (EJBException e){
+			System.err.println("provided ID does not exist");
+			return Response.status(400).build();
+		}
+	}*/
 	@GET
 	@Path("/licfromsumId/{id}")
 	@Produces("application/json")
@@ -58,12 +78,19 @@ public class LicenceResource {
 		return Response.ok(result).build();
 	}
 	@GET
-	@Path("/sumfromlic/{id}")
+	@Path("/sumfromlic")
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces("application/json")
-	public Response getSummaryFromLicense(@PathParam("id") int id) {
-		License l = service.getLicenseById(id);
-		List<Summary> result = service.getSummariesFromLicense(l.getId());
-		return Response.ok(result).build();
+	public Response getSummariesFromLicense(String sJson) {
+		try {
+			JSONObject json = new JSONObject(sJson);
+			License l = service.getLicenseById(json.getInt("id"));
+			List<Summary> result = service.getSummariesFromLicense(l);
+			return Response.ok(result).build();
+		}catch (EJBException e){
+			System.err.println("provided ID does not exist");
+			return Response.status(400).build();
+		}
 	}
 	@GET
 	@Path("/sumfromlicid/{id}")
@@ -76,33 +103,38 @@ public class LicenceResource {
 
 	//POST
 	@POST
-	@Path("/license/{createLicense}")
-	@Consumes("application/json")
-	public Response createLicense(@PathParam("createLicense")JSONObject json) {
+	@Path("/createlic")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createLicense(String sJson) {
 		try {
+			JSONObject json = new JSONObject(sJson);
 			License license = new License(json.getString("name"), json.getString("sourceURL"));
+			//TODO Search db for existing licence name
 			service.createLicense(license);
 			return Response.ok().build();
-		}catch (Exception e){
+		}catch (JSONException e){
+			System.err.println("Invalid json format" + e);
 			return Response.status(400).build();
 		}
 	}
 
 	@POST
-	@Path("/summary/{summaryjson}")
-	@Consumes("application/json")
-	public Response createSummary(@PathParam("summaryjson")JSONObject json) {
+	@Path("/createsum")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createSummary(String sJson) {
 		try {
+			JSONObject json = new JSONObject(sJson);
 			Summary summary = new Summary(json.getString("name"),json.getString("description"));
+			//TODO Search db for existing summary name
 			service.createSummary(summary);
 			return Response.ok().build();
-		}catch (Exception e){
+		}catch (JSONException e){
+			System.err.println("Invalid json format" + e);
 			return Response.status(400).build();
 		}
 	}
-	@POST
+	@GET
 	@Path("/connectlicsum/{lid}/{sid}")
-	@Consumes("application/json")
 	public Response addSummaryToLicense(@PathParam("lid") int lId,
 										@PathParam("sid") int sId) {
 		try {
@@ -111,6 +143,7 @@ public class LicenceResource {
 			service.addSummaryToLicense(license, summary);
 			return Response.ok().build();
 		}catch (Exception e){
+			System.err.println("Invalid argument"+e);
 			return Response.status(400).build();
 		}
 	}
@@ -163,9 +196,8 @@ public class LicenceResource {
 		Summary summary = new Summary("TestSummary", "Ipsum Testum");
 		License license = new License("TestLicence","http://www.Thisgoesnowhere.now");
 		service.createSummary(summary);
-		List<Summary> sum = new ArrayList<>();
-		sum.add(summary);
-		service.createLicenseFromSummaries(license, sum);
+		service.createLicense(license);
+		service.addSummaryToLicense(license,summary);
 		return Response.ok(license).build();
 	}
 }
