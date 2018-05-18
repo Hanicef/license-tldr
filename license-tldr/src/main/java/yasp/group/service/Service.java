@@ -23,6 +23,7 @@ public class Service {
 	}
 
 	public License getLicenseById(int id) {
+
 		License license = dao.getLicenseById(id);
 		if (license == null) throw new ServiceException("license", id, "Row not found");
 		return license;

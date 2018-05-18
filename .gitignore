@@ -3,3 +3,5 @@ license-tldr/target*
 *.tmp
 *.iml
 .idea
+moveWar.sh
+license-tldr/lib/

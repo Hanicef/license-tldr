@@ -118,7 +118,6 @@ public class LicenceResource {
 			System.err.println("Invalid json format" + e);
 			return Response.status(400).build();
 		}catch (ServiceException e){
-			System.err.println("Invalid argument"+e);
 			return Response.status(400).build();
 		}
 	}
@@ -137,7 +136,6 @@ public class LicenceResource {
 			System.err.println("Invalid json format" + e);
 			return Response.status(400).build();
 		}catch (ServiceException e){
-			System.err.println("Invalid argument"+e);
 			return Response.status(400).build();
 		}
 	}
@@ -151,7 +149,6 @@ public class LicenceResource {
 			service.addSummaryToLicense(license, summary);
 			return Response.ok().build();
 		}catch (ServiceException e){
-			System.err.println("Invalid argument"+e);
 			return Response.status(400).build();
 		}
 	}
@@ -160,9 +157,10 @@ public class LicenceResource {
 
 	//PUT
 	@PUT
-	@Path("/editlicense/{license}")
-	@Consumes("application/json")
-	public Response editLicense(@PathParam("license") JSONObject json){
+	@Path("/editlicense")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response editLicense(String sJson){
+		JSONObject json = new JSONObject(sJson);
 		License l = service.getLicenseById(json.getInt("id"));
 		l.setName(json.getString("name"));
 		l.setSourceURL(json.getString("sourceURL"));
@@ -170,9 +168,10 @@ public class LicenceResource {
 		return Response.ok().build();
 	}
 	@PUT
-	@Path("/editsummary/{summary}")
-	@Consumes("application/json")
-	public Response editSummary(@PathParam("summary") JSONObject json){
+	@Path("/editsummary")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response editSummary(String sJson){
+		JSONObject json = new JSONObject(sJson);
 		Summary s = service.getSummaryById(json.getInt("id"));
 		s.setName(json.getString("name"));
 		s.setDescription(json.getString("description"));
