@@ -76,7 +76,10 @@ public class DataAccess {
 	}
 
 	public void createLicenseSummary(LicenseSummary licenseSummary) {
-		manager.persist(licenseSummary);
+		try {
+			manager.persist(licenseSummary);
+		} catch (EntityExistsException e) {
+		}
 	}
 
 
