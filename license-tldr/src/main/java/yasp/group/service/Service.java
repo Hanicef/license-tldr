@@ -23,11 +23,15 @@ public class Service {
 	}
 
 	public License getLicenseById(int id) {
-		return dao.getLicenseById(id);
+		License license = dao.getLicenseById(id);
+		if (license == null) throw new ServiceException("license", id, "Row not found");
+		return license;
 	}
 
 	public Summary getSummaryById(int id) {
-		return dao.getSummaryById(id);
+		Summary summary = dao.getSummaryById(id);
+		if (summary == null) throw new ServiceException("summary", id, "Row not found");
+		return summary;
 	}
 
 	public List<Summary> getSummariesFromLicense(License license) {
