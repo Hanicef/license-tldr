@@ -1,7 +1,7 @@
 
 package yasp.group.service;
 
-public class ServiceException extends RuntimeException {
+public class ServiceException extends Exception {
 	private String table;
 	private int id;
 

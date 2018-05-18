@@ -9,13 +9,10 @@ import java.io.Serializable;
 @Table(name="licenseSummary")
 public class LicenseSummary implements Serializable {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id", nullable=false)
-	private int id;
-
 	@JoinColumn(table="license",columnDefinition="id")
 	private int license;
 
+	@Id
 	@JoinColumn(table="summary",columnDefinition="id")
 	private int summary;
 
@@ -27,7 +24,6 @@ public class LicenseSummary implements Serializable {
 		this.summary = summary;
 	}
 
-	public int getId() { return this.id; }
 	public int getLicense() { return this.license; }
 	public int getSummary() { return this.summary; }
 
