@@ -76,9 +76,12 @@ public class DataAccess {
 	}
 
 	public void createLicenseSummary(LicenseSummary licenseSummary) {
-		try {
+		LicenseSummary result = manager.createQuery("SELECT ls FROM LicenseSummary ls WHERE ls.license = :lid AND ls.summary = :sid", LicenseSummary.class)
+			.setParameter("lid", licenseSummary.license)
+			.setParameter("sid", licenseSummary.summary)
+			.getResultList();
+		if (result.size() == 0) {
 			manager.persist(licenseSummary);
-		} catch (EntityExistsException e) {
 		}
 	}
 
