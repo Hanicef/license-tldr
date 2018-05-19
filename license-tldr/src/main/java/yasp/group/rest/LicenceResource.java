@@ -34,8 +34,12 @@ public class LicenceResource {
 	@Path("/license/{id}")
 	@Produces("application/json")
 	public Response getLicenseById(@PathParam("id") int id) {
-		License result = service.getLicenseById(id);
-		return Response.ok(result).build();
+		try {
+			License result = service.getLicenseById(id);
+			return Response.ok(result).build();
+		} catch (ServiceException e) {
+			return Response.status(400).build();
+		}
 	}
 	@GET
 	@Path("/licfromsum")
@@ -50,14 +54,21 @@ public class LicenceResource {
 		}catch (EJBException e){
 			System.err.println("provided ID does not exist");
 			return Response.status(400).build();
+		} catch (ServiceException e) {
+			return Response.status(400).build();
 		}
 	}
 	@GET
 	@Path("/licfromsumId/{id}")
 	@Produces("application/json")
 	public Response getLicensesFromSummary(@PathParam("id") int id) {
-		List<License> result = service.getLicensesFromSummary(id);
-		return Response.ok(result).build();
+		try {
+			List<License> result = service.getLicensesFromSummary(id);
+			return Response.ok(result).build();
+		}catch (EJBException e){
+			System.err.println("provided ID does not exist");
+			return Response.status(400).build();
+		}
 	}
 
 
@@ -74,8 +85,12 @@ public class LicenceResource {
 	@Path("/summary/{id}")
 	@Produces("application/json")
 	public Response getSummaryById(@PathParam("id") int id) {
-		Summary result = service.getSummaryById(id);
-		return Response.ok(result).build();
+		try {
+			Summary result = service.getSummaryById(id);
+			return Response.ok(result).build();
+		} catch (ServiceException e) {
+			return Response.status(400).build();
+		}
 	}
 	@GET
 	@Path("/sumfromlic")
@@ -89,6 +104,8 @@ public class LicenceResource {
 			return Response.ok(result).build();
 		}catch (EJBException e){
 			System.err.println("provided ID does not exist");
+			return Response.status(400).build();
+		} catch (ServiceException e) {
 			return Response.status(400).build();
 		}
 	}
@@ -115,8 +132,6 @@ public class LicenceResource {
 		}catch (JSONException e){
 			System.err.println("Invalid json format" + e);
 			return Response.status(400).build();
-		}catch (ServiceException e){
-			return Response.status(400).build();
 		}
 	}
 
@@ -132,8 +147,6 @@ public class LicenceResource {
 			return Response.ok().build();
 		}catch (JSONException e){
 			System.err.println("Invalid json format" + e);
-			return Response.status(400).build();
-		}catch (ServiceException e){
 			return Response.status(400).build();
 		}
 	}
@@ -158,23 +171,31 @@ public class LicenceResource {
 	@Path("/editlicense")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response editLicense(String sJson){
-		JSONObject json = new JSONObject(sJson);
-		License l = service.getLicenseById(json.getInt("id"));
-		l.setName(json.getString("name"));
-		l.setSourceURL(json.getString("sourceURL"));
-		service.applyLicenseChanges(l);
-		return Response.ok().build();
+		try {
+			JSONObject json = new JSONObject(sJson);
+			License l = service.getLicenseById(json.getInt("id"));
+			l.setName(json.getString("name"));
+			l.setSourceURL(json.getString("sourceURL"));
+			service.applyLicenseChanges(l);
+			return Response.ok().build();
+		} catch (ServiceException e) {
+			return Response.status(400).build();
+		}
 	}
 	@PUT
 	@Path("/editsummary")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response editSummary(String sJson){
-		JSONObject json = new JSONObject(sJson);
-		Summary s = service.getSummaryById(json.getInt("id"));
-		s.setName(json.getString("name"));
-		s.setDescription(json.getString("description"));
-		service.applySummaryChanges(s);
-		return Response.ok().build();
+		try {
+			JSONObject json = new JSONObject(sJson);
+			Summary s = service.getSummaryById(json.getInt("id"));
+			s.setName(json.getString("name"));
+			s.setDescription(json.getString("description"));
+			service.applySummaryChanges(s);
+			return Response.ok().build();
+		} catch (ServiceException e) {
+			return Response.status(400).build();
+		}
 	}
 
 
